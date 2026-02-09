@@ -15,6 +15,9 @@ public class Main {
 
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+
         initBoard();
         printBoard();
 
@@ -24,11 +27,39 @@ public class Main {
         Ship cruiser = new Ship("Cruiser", 3);
         Ship destroyer = new Ship("Destroyer", 2);
 
+        Ship[] ships = new Ship[] {aircraftCarrier, battleship, submarine, cruiser, destroyer};
+
+
+        for(Ship ship : ships) {
+            System.out.printf("Enter the coordinates of the %s (%d cells):\n", ship.name, ship.length);
+            boolean created;
+            do {
+
+                String c1 = scanner.next();
+                String c2 = scanner.next();
+                int length = checkLength(c1, c2);
+                if(length == 0) {
+                    System.out.println("Error! Wrong ship location! Try again:");
+                    created = false;
+                } else if(length == ship.length) {
+                    created = placeShip(c1, c2, ship);
+                }else {
+                    System.out.printf("Error! Wrong length of the %s! Try again:\n", ship.name);
+                    created = false;
+                }
+
+            } while (!created);
+            printBoard();
+
+        }
+
+
 
         System.out.println("Enter coordinates of the ship: ");
-        Scanner scanner = new Scanner(System.in);
+
         String c1 = scanner.next();
         String c2 = scanner.next();
+
         int length = checkLength(c1, c2);
 
         String[] placements;
@@ -71,9 +102,9 @@ public class Main {
                 System.out.print(board[indexY][indexX] + " ");
 
             }
-            System.out.println();
+            System.out.println("");
         }
-
+        System.out.println("");
     }
 
     public static void initBoard() {
@@ -153,12 +184,13 @@ public class Main {
         String[] placements = shipPlacements(c1, c2, ship.length);
 
 
+
         //check around
         for(int i = 0; i < ship.length; i++) {
 
 
             if(!checkAround(placements[i])){
-                System.out.print(" You placed it too close to another one.");
+                System.out.println("Error! You placed it too close to another one. Try again:");
                return false;
             }
         }
@@ -191,18 +223,25 @@ public class Main {
             return false;
         }
         if(x > 0) {
-            if(board[x + 1][y] != '~' || board[x-1][y] != '~'){
-                return false;
-            } else if(board[x + 1][y] != '~'){
+            if(board[x - 1][y] != '~') {
                 return false;
             }
+            if(x < 9) {
+                if(board[x + 1][y] != '~') {
+                    return false;
+                }
+            }
+
         }
 
         if(y > 0) {
-            if(board[x][y+1] != '~' || board[x][y-1] != '~'){
+            if(board[x][y-1] != '~') {
                 return false;
-            } else if(board[x][y + 1] != '~'){
-                return false;
+            }
+            if(y < 9) {
+                if(board[x][y + 1] != '~') {
+                    return false;
+                }
             }
         }
 
