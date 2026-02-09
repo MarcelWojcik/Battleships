@@ -96,10 +96,11 @@ public class Main {
                     continue;
                 }
 
-                int indexX = i - 1;
-                int indexY = j - 1;
+                int indexX = j - 1;
 
-                System.out.print(board[indexY][indexX] + " ");
+                int indexY = i - 1;
+
+                System.out.print(board[indexX][indexY] + " ");
 
             }
             System.out.println("");
@@ -198,7 +199,7 @@ public class Main {
         for(int i = 0; i < ship.length; i++) {
             int x = getXY(placements[i])[0];
             int y = getXY(placements[i])[1];
-            board[x][y] = '0';
+            board[x][y] = 'O';
         }
 
         return true;
