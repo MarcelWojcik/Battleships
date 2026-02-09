@@ -18,6 +18,13 @@ public class Main {
         initBoard();
         printBoard();
 
+        Ship aircraftCarrier = new Ship("Aircraft Carrier", 5);
+        Ship battleship = new Ship("Battleship", 4);
+        Ship submarine = new Ship("Submarine", 3);
+        Ship cruiser = new Ship("Cruiser", 3);
+        Ship destroyer = new Ship("Destroyer", 2);
+
+
         System.out.println("Enter coordinates of the ship: ");
         Scanner scanner = new Scanner(System.in);
         String c1 = scanner.next();
