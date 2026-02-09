@@ -199,9 +199,9 @@ public class Main {
         }
 
         if(y > 0) {
-            if(board[x + 1][y] != '~' || board[x-1][y] != '~'){
+            if(board[x][y+1] != '~' || board[x][y-1] != '~'){
                 return false;
-            } else if(board[x + 1][y] != '~'){
+            } else if(board[x][y + 1] != '~'){
                 return false;
             }
         }
