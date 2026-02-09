@@ -1,7 +1,7 @@
 package battleships;
 
 
-import javax.xml.transform.Source;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -18,8 +18,6 @@ public class Main {
         initBoard();
         printBoard();
 
-        System.out.println((int)'J');
-
         System.out.println("Enter coordinates of the ship: ");
         Scanner scanner = new Scanner(System.in);
         String c1 = scanner.next();
@@ -28,14 +26,14 @@ public class Main {
         String[] placements;
         if(length > 0){
             placements = shipPlacements(c1, c2, length);
-            System.out.println(Arrays.toString(placements));
-            System.out.println(length);
+            System.out.println("Length: " + length);
+            System.out.print("Parts: ");
+            for(int i = 0; i < length; i++) {
+                System.out.print(placements[i] + " ");
+            }
         }else {
             System.out.println("Error!");
         }
-
-
-
 
     }
 
