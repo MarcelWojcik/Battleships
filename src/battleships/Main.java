@@ -28,14 +28,14 @@ public class Main {
         String[] placements;
         if(length > 0){
             placements = shipPlacements(c1, c2, length);
-            System.out.println(Arrays.toString(placements));
-            System.out.println(length);
+            System.out.println("Length: " + length);
+            System.out.print("Parts: ");
+            for(int i = 0; i < length; i++) {
+                System.out.print(placements[i] + " ");
+            }
         }else {
             System.out.println("Error!");
         }
-
-
-
 
     }
 
