@@ -1,6 +1,7 @@
 package battleships;
 
 
+import javax.xml.transform.Source;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -24,8 +25,10 @@ public class Main {
         String c1 = scanner.next();
         String c2 = scanner.next();
         int length = checkLength(c1, c2);
+        String[] placements;
         if(length > 0){
-
+            placements = shipPlacements(c1, c2, length);
+            System.out.println(Arrays.toString(placements));
             System.out.println(length);
         }else {
             System.out.println("Error!");
@@ -81,6 +84,7 @@ public class Main {
             int column2 = Integer.parseInt(c2.substring(1));
             int length = 0;
 
+
             boolean checker = checkInput(row1) && checkInput(row2) && checkInput(column1) && checkInput(column2);
             if(!checker) return 0;
             if (row1 == row2) {
@@ -97,6 +101,43 @@ public class Main {
         }catch(IllegalArgumentException e){
             return 0;
         }
+    }
+
+    public static String[] shipPlacements(String c1, String c2, int length) {
+        String[] placement = new String[length];
+        char row1 = c1.charAt(0);
+        char row2 = c2.charAt(0);
+        int column1 = Integer.parseInt(c1.substring(1));
+        int column2 = Integer.parseInt(c2.substring(1));
+        if (row1 == row2) {
+            if(column1 < column2) {
+                for(int i = 0; i < length; i++) {
+                    placement[i] = ""+row1+(i + column1);
+                }
+            } else {
+                for(int i = length - 1; i >= 0; i--) {
+                    placement[length - i - 1] = ""+row1+(i + column2);
+                }
+            }
+
+        } else if (column1 == column2) {
+            int charRow1 = (int)row1;
+            int charRow2 = (int)row2;
+            int nextRow;
+            if(charRow1 < charRow2) {
+                for(int i = 0; i < length; i++) {
+                    nextRow = charRow1 + i;
+                    placement[i] = ""+(char)nextRow + column1 +"";
+                }
+            } else {
+                for(int i = length - 1; i >= 0; i--) {
+                    nextRow = charRow2 + i;
+                    placement[length - i - 1] = ""+(char)nextRow + column1 + "";
+                }
+            }
+
+        }
+        return placement;
     }
 
 
