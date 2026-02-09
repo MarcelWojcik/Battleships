@@ -30,9 +30,12 @@ public class Main {
         String c1 = scanner.next();
         String c2 = scanner.next();
         int length = checkLength(c1, c2);
+
         String[] placements;
-        if(length > 0){
+        if(length == aircraftCarrier.length){
             placements = shipPlacements(c1, c2, length);
+            placeShip(c1, c2, aircraftCarrier);
+            printBoard();
             System.out.println("Length: " + length);
             System.out.print("Parts: ");
             for(int i = 0; i < length; i++) {
@@ -65,7 +68,7 @@ public class Main {
                 int indexX = i - 1;
                 int indexY = j - 1;
 
-                System.out.print(board[indexX][indexY] + " ");
+                System.out.print(board[indexY][indexX] + " ");
 
             }
             System.out.println();
@@ -145,6 +148,66 @@ public class Main {
         return placement;
     }
 
+    public static boolean placeShip(String c1, String c2, Ship ship) {
+
+        String[] placements = shipPlacements(c1, c2, ship.length);
+
+
+        //check around
+        for(int i = 0; i < ship.length; i++) {
+
+
+            if(!checkAround(placements[i])){
+                System.out.print(" You placed it too close to another one.");
+               return false;
+            }
+        }
+
+        for(int i = 0; i < ship.length; i++) {
+            int x = getXY(placements[i])[0];
+            int y = getXY(placements[i])[1];
+            board[x][y] = '0';
+        }
+
+        return true;
+    }
+
+    public static int[] getXY(String coord) {
+        int x = Integer.parseInt(coord.substring(1)) - 1;
+        int y = (int)coord.charAt(0) - 65;
+
+        return new int[] {x, y};
+    }
+
+    public static boolean checkAround(String coord){
+        int x = getXY(coord)[0];
+        int y = getXY(coord)[1];
+
+        try {
+            if(board[x][y] != '~'){
+                return false;
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return false;
+        }
+        if(x > 0) {
+            if(board[x + 1][y] != '~' || board[x-1][y] != '~'){
+                return false;
+            } else if(board[x + 1][y] != '~'){
+                return false;
+            }
+        }
+
+        if(y > 0) {
+            if(board[x + 1][y] != '~' || board[x-1][y] != '~'){
+                return false;
+            } else if(board[x + 1][y] != '~'){
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public static boolean checkInput(char c) {
         int input = (int)c;
