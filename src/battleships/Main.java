@@ -53,28 +53,15 @@ public class Main {
 
         }
 
+        System.out.println("The game starts!");
+        printBoard();
+        System.out.println("Take a shot!");
+        String target;
 
+        do {
+             target = scanner.next();
+        }while(!shoot(target));
 
-        System.out.println("Enter coordinates of the ship: ");
-
-        String c1 = scanner.next();
-        String c2 = scanner.next();
-
-        int length = checkLength(c1, c2);
-
-        String[] placements;
-        if(length == aircraftCarrier.length){
-            placements = shipPlacements(c1, c2, length);
-            placeShip(c1, c2, aircraftCarrier);
-            printBoard();
-            System.out.println("Length: " + length);
-            System.out.print("Parts: ");
-            for(int i = 0; i < length; i++) {
-                System.out.print(placements[i] + " ");
-            }
-        }else {
-            System.out.println("Error!");
-        }
 
     }
 
@@ -244,6 +231,29 @@ public class Main {
                     return false;
                 }
             }
+        }
+
+        return true;
+    }
+
+    public static boolean shoot(String c) {
+        int x = getXY(c)[0];
+        int y = getXY(c)[1];
+
+        try {
+            if(board[x][y] == 'O') {
+                board[x][y] = 'X';
+                printBoard();
+                System.out.println("You hit a ship!");
+            } else {
+                board[x][y] = 'M';
+                printBoard();
+                System.out.println("You missed!");
+            }
+
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Error! You entered the wrong coordinates! Try again:");
+            return false;
         }
 
         return true;
