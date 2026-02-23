@@ -54,7 +54,7 @@ public class Main {
         }
 
         System.out.println("The game starts!");
-        printBoard();
+        printFogBoard();
         System.out.println("Take a shot!");
         String target;
 
@@ -63,6 +63,41 @@ public class Main {
         }while(!shoot(target));
 
 
+    }
+
+    public static void printFogBoard() {
+        for(int i = 0; i <= height; i++) {
+            for(int j = 0; j<= width; j++) {
+                if(i == 0 && j == 0) {
+                    System.out.print("  ");
+                    continue;
+                }
+                if(i == 0) {
+                    System.out.print(j + " ");
+                    continue;
+                }
+                if(j == 0){
+                    int symbol = 64 + i;
+                    System.out.print((char)symbol + " ");
+                    continue;
+                }
+
+                int indexX = j - 1;
+
+                int indexY = i - 1;
+
+
+                if(board[indexX][indexY] == 'X' || board[indexX][indexY] == 'M') {
+                    System.out.print(board[indexX][indexY] + " ");
+                }
+                else{
+                    System.out.print('~' + " ");
+                }
+
+            }
+            System.out.println("");
+        }
+        System.out.println("");
     }
 
     public static void printBoard(){
@@ -237,19 +272,21 @@ public class Main {
     }
 
     public static boolean shoot(String c) {
+
         int x = getXY(c)[0];
         int y = getXY(c)[1];
 
         try {
             if(board[x][y] == 'O') {
                 board[x][y] = 'X';
-                printBoard();
-                System.out.println("You hit a ship!");
+                printFogBoard();
+                System.out.println("You hit a ship!\n");
             } else {
                 board[x][y] = 'M';
-                printBoard();
-                System.out.println("You missed!");
+                printFogBoard();
+                System.out.println("You missed!\n");
             }
+            printBoard();
 
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Error! You entered the wrong coordinates! Try again:");
