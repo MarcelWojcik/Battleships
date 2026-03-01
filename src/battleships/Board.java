@@ -1,18 +1,28 @@
 package battleships;
 
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.HashMap;
+
+import static battleships.Main.scanner;
+import static battleships.Util.*;
+
 
 public class Board {
 
 
     private final static int height = 10;
     private final static int width = 10;
-    private final static char[][] board = new char[height][width];
-    private static LinkedList<String> p1Ships = new LinkedList<String>();
+    private final char[][] board = new char[height][width];
+
+    private HashMap<String, Character> points = new HashMap<>();
 
 
-    public static void printFogBoard() {
+
+    Board(String name) {
+        initBoard(name);
+    }
+
+    public void printBoard(boolean fogged) {
         for(int i = 0; i <= height; i++) {
             for(int j = 0; j<= width; j++) {
                 if(i == 0 && j == 0) {
@@ -34,11 +44,13 @@ public class Board {
                 int indexY = i - 1;
 
 
-                if(board[indexX][indexY] == 'X' || board[indexX][indexY] == 'M') {
+                if((board[indexX][indexY] == 'X' || board[indexX][indexY] == 'M') && !fogged) {
                     System.out.print(board[indexX][indexY] + " ");
                 }
-                else{
+                else if(fogged){
                     System.out.print('~' + " ");
+                } else {
+                    System.out.print(board[indexX][indexY] + " ");
                 }
 
             }
@@ -47,51 +59,56 @@ public class Board {
         System.out.println("");
     }
 
-    public static void printBoard(){
-
-        for(int i = 0; i <= height; i++) {
-            for(int j = 0; j<= width; j++) {
-                if(i == 0 && j == 0) {
-                    System.out.print("  ");
-                    continue;
-                }
-                if(i == 0) {
-                    System.out.print(j + " ");
-                    continue;
-                }
-                if(j == 0){
-                    int symbol = 64 + i;
-                    System.out.print((char)symbol + " ");
-                    continue;
-                }
-
-                int indexX = j - 1;
-
-                int indexY = i - 1;
-
-                System.out.print(board[indexX][indexY] + " ");
-
-            }
-            System.out.println("");
-        }
-        System.out.println("");
+    public void printBoard(){
+        printBoard(false);
     }
 
-    public static void initBoard() {
-        for(char[] chars : board) {
-            Arrays.fill(chars, '~');
+    public void initBoard(String name) {
+
+        for(char[] row : board) {
+            Arrays.fill(row, '~');
         }
+
+        Ship aircraftCarrier = new Ship("Aircraft Carrier", 5);
+        Ship battleship = new Ship("Battleship", 4);
+        Ship submarine = new Ship("Submarine", 3);
+        Ship cruiser = new Ship("Cruiser", 3);
+        Ship destroyer = new Ship("Destroyer", 2);
+        Ship[] ships = new Ship[]{aircraftCarrier, battleship, submarine, cruiser, destroyer};
+
+
+        System.out.println(name + ", place your ships on the game field\n");
+        for (Ship ship : ships) {
+            printBoard(false);
+            System.out.printf("Enter the coordinates of the %s (%d cells):\n", ship.name, ship.length);
+            boolean created;
+            do {
+
+                String c1 = scanner.next();
+                String c2 = scanner.next();
+                int length = checkLength(c1, c2);
+                if (length == 0) {
+                    System.out.print("Error! Wrong ship location! Try again:");
+                    created = false;
+                } else if (length == ship.length) {
+                    created = placeShip(c1, c2, ship);
+                } else {
+                    System.out.printf("Error! Wrong length of the %s! Try again:", ship.name);
+                    created = false;
+                }
+                System.out.print("\n");
+            } while (!created);
+        }
+        printBoard();
+
     }
 
-    public static boolean placeShip(String c1, String c2, Ship ship) {
+    public boolean placeShip(String c1, String c2, Ship ship) {
 
         String[] placements = shipPlacements(c1, c2, ship.length);
 
-
-
         //check around
         for(int i = 0; i < ship.length; i++) {
-
 
             if(!checkAround(placements[i])){
                 System.out.println("Error! You placed it too close to another one. Try again:");
@@ -100,10 +117,12 @@ public class Board {
         }
 
         for(int i = 0; i < ship.length; i++) {
+
             int x = getXY(placements[i])[0];
             int y = getXY(placements[i])[1];
-            board[x][y] = 'O';
-            p1Ships.add(placements[i]);
+
+            this.board[x][y] = 'O';
+            points.put(placements[i], '0');
         }
 
         return true;
@@ -139,11 +158,13 @@ public class Board {
     }
 
     public static String[] shipPlacements(String c1, String c2, int length) {
+
         String[] placement = new String[length];
         char row1 = c1.charAt(0);
         char row2 = c2.charAt(0);
         int column1 = Integer.parseInt(c1.substring(1));
         int column2 = Integer.parseInt(c2.substring(1));
+
         if (row1 == row2) {
             if(column1 < column2) {
                 for(int i = 0; i < length; i++) {
@@ -154,7 +175,6 @@ public class Board {
                     placement[length - i - 1] = ""+row1+(i + column2);
                 }
             }
-
         } else if (column1 == column2) {
             int charRow1 = (int)row1;
             int charRow2 = (int)row2;
@@ -176,52 +196,23 @@ public class Board {
     }
 
 
+    public boolean checkAround(String coord){
 
-    public static int[] getXY(String coord) {
-        int x = Integer.parseInt(coord.substring(1)) - 1;
-        int y = (int)coord.charAt(0) - 65;
+        if(points.containsKey(coord)) return false;
+        int y = Integer.parseInt(coord.substring(1));
+        char prefix = coord.charAt(0);
 
-        return new int[] {x, y};
-    }
+        if(points.containsKey((prefix) + String.valueOf(y + 1)) || points.containsKey(prefix + String.valueOf(y - 1))) return false;
+        int i = ((int) prefix) + 1;
+        if(points.containsKey(String.valueOf((char) i + String.valueOf(y)))) return false;
+        i = ((int) prefix) + 1;
+        if(points.containsKey(String.valueOf((char) i + String.valueOf(y)))) return false;
 
-    public static boolean checkAround(String coord){
-        int x = getXY(coord)[0];
-        int y = getXY(coord)[1];
-
-        try {
-            if(board[x][y] != '~' && board[x][y] != 'X'){
-                return false;
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return false;
-        }
-        if(x > 0) {
-            if(board[x - 1][y] != '~' && board[x - 1][y] != 'X') {
-                return false;
-            }
-            if(x < 9) {
-                if(board[x + 1][y] != '~' && board[x + 1][y] != 'X') {
-                    return false;
-                }
-            }
-
-        }
-
-        if(y > 0) {
-            if(board[x][y-1] != '~' && board[x][y-1] != 'X') {
-                return false;
-            }
-            if(y < 9) {
-                if(board[x][y + 1] != '~' && board[x][y + 1] != 'X') {
-                    return false;
-                }
-            }
-        }
 
         return true;
     }
 
-    public static boolean shoot(String c) {
+    public boolean shoot(String c) {
 
         int x = getXY(c)[0];
         int y = getXY(c)[1];
@@ -229,8 +220,8 @@ public class Board {
         try {
             if(board[x][y] == 'O' || board[x][y] == 'X') {
                 board[x][y] = 'X';
-                p1Ships.remove(c);
-                printFogBoard();
+
+                printBoard();
                 if(gameOver()){
                     System.out.println("You sank the last ship. You won. Congratulations!");
                     return true;
@@ -243,7 +234,7 @@ public class Board {
 
             } else {
                 board[x][y] = 'M';
-                printFogBoard();
+                printBoard();
                 System.out.println("You missed! Try again: ");
             }
 
@@ -254,16 +245,8 @@ public class Board {
         return false;
     }
 
-    public static boolean checkInput(char c) {
-        int input = (int)c;
-        return c >= 65 && c <= 74;
-    }
 
-    public static boolean checkInput(int c) {
-        return c >= 1 && c <= 10;
-    }
-
-    public static boolean gameOver() {
-        return p1Ships.isEmpty();
+    public boolean gameOver() {
+        return points.containsValue('O');
     }
 }
