@@ -1,4 +1,4 @@
-package battleships;
+package battleship;
 
 public class Ship {
     public String name;

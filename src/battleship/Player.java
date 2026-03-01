@@ -1,14 +1,14 @@
-package battleships;
+package battleship;
 
 public class Player {
 
     private String name;
-    private Board board;
+    public final battleship.Board board;
 
 
     Player(String name) {
         this.name = name;
-        this.board = new Board(this.name);
+        this.board = new battleship.Board(this.name);
     }
 
     public String getName() {

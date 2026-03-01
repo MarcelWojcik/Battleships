@@ -1,10 +1,10 @@
-package battleships;
+package battleship;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static battleships.Main.scanner;
-import static battleships.Util.*;
+import static battleship.Main.scanner;
+import static battleship.Util.*;
 
 
 public class Board {
@@ -12,7 +12,7 @@ public class Board {
 
     private final static int height = 10;
     private final static int width = 10;
-    private final char[][] board = new char[height][width];
+    protected final char[][] gameBoard = new char[height][width];
 
     private HashMap<String, Character> points = new HashMap<>();
 
@@ -44,19 +44,18 @@ public class Board {
                 int indexY = i - 1;
 
 
-                if((board[indexX][indexY] == 'X' || board[indexX][indexY] == 'M') && !fogged) {
-                    System.out.print(board[indexX][indexY] + " ");
+                if((gameBoard[indexX][indexY] == 'X' || gameBoard[indexX][indexY] == 'M')) {
+                    System.out.print(gameBoard[indexX][indexY] + " ");
                 }
                 else if(fogged){
                     System.out.print('~' + " ");
                 } else {
-                    System.out.print(board[indexX][indexY] + " ");
+                    System.out.print(gameBoard[indexX][indexY] + " ");
                 }
 
             }
             System.out.println("");
         }
-        System.out.println("");
     }
 
     public void printBoard(){
@@ -65,7 +64,7 @@ public class Board {
 
     public void initBoard(String name) {
 
-        for(char[] row : board) {
+        for(char[] row : gameBoard) {
             Arrays.fill(row, '~');
         }
 
@@ -80,6 +79,7 @@ public class Board {
         System.out.println(name + ", place your ships on the game field\n");
         for (Ship ship : ships) {
             printBoard(false);
+            System.out.println();
             System.out.printf("Enter the coordinates of the %s (%d cells):\n", ship.name, ship.length);
             boolean created;
             do {
@@ -100,6 +100,7 @@ public class Board {
             } while (!created);
         }
         printBoard();
+        System.out.println();
 
     }
 
@@ -121,7 +122,7 @@ public class Board {
             int x = getXY(placements[i])[0];
             int y = getXY(placements[i])[1];
 
-            this.board[x][y] = 'O';
+            this.gameBoard[x][y] = 'O';
             points.put(placements[i], '0');
         }
 
@@ -205,48 +206,49 @@ public class Board {
         if(points.containsKey((prefix) + String.valueOf(y + 1)) || points.containsKey(prefix + String.valueOf(y - 1))) return false;
         int i = ((int) prefix) + 1;
         if(points.containsKey(String.valueOf((char) i + String.valueOf(y)))) return false;
-        i = ((int) prefix) + 1;
+        i = ((int) prefix) - 1;
         if(points.containsKey(String.valueOf((char) i + String.valueOf(y)))) return false;
 
 
         return true;
     }
 
-    public boolean shoot(String c) {
-
-        int x = getXY(c)[0];
-        int y = getXY(c)[1];
+    public boolean shoot(String target, Player enemy) {
 
         try {
-            if(board[x][y] == 'O' || board[x][y] == 'X') {
-                board[x][y] = 'X';
+            int x = getXY(target)[0];
+            int y = getXY(target)[1];
+            if(enemy.board.gameBoard[x][y] == 'O' || enemy.board.gameBoard[x][y] == 'X') {
+                enemy.board.gameBoard[x][y] = 'X';
+                enemy.board.points.remove(target);
 
-                printBoard();
-                if(gameOver()){
+                if(enemy.board.gameOver()){
                     System.out.println("You sank the last ship. You won. Congratulations!");
                     return true;
                 }
-                if(checkAround(c)) {
-                    System.out.println("You sank a ship! Specify a new target: ");
+                if(checkAround(target)) {
+                    System.out.println("You sank a ship!");
                 } else {
-                    System.out.println("You hit a ship! Try again: ");
+                    System.out.println("You hit a ship!");
                 }
 
             } else {
-                board[x][y] = 'M';
-                printBoard();
-                System.out.println("You missed! Try again: ");
+                enemy.board.gameBoard[x][y] = 'M';
+                System.out.println("You missed!");
             }
 
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("Error! You entered the wrong coordinates! Try again:");
 
+        } catch (Exception e) {
+            System.out.println("Error! You entered the wrong coordinates! Try again:");
+            return false;
         }
-        return false;
+        return true;
     }
+
 
 
     public boolean gameOver() {
-        return points.containsValue('O');
+        return points.isEmpty();
     }
+
 }
